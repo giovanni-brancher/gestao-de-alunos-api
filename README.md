@@ -41,6 +41,8 @@ banco está vazio (veja [Dados fake pré-carregados](#dados-fake-pré-carregados
 - **morgan** — log de requisições HTTP no console
 - **nodemon** (dependência de desenvolvimento) — reinício automático do servidor durante o
   desenvolvimento
+- **Mocha**, **Chai** e **SuperTest** (dependências de desenvolvimento): testes automatizados da
+  API, com **dotenv** para as variáveis de ambiente e **Mochawesome** para o relatório HTML
 
 A autenticação é real: senhas com hash (bcrypt) e sessões via JWT assinado.
 
@@ -74,13 +76,16 @@ src/
     asyncHandler.js
 docs/
   openapi.yaml            # especificação Swagger/OpenAPI (fonte da documentação)
+test/                     # testes automatizados (veja "Testes automatizados")
+.mocharc.json             # configuração do Mocha
+.env.example              # variáveis de ambiente usadas pelos testes
 ```
 
 ## Instalação e execução
 
 Pré-requisitos:
 
-- Node.js 18+ (usa `crypto.randomUUID`, disponível nativamente).
+- Node.js 20.19 ou superior (exigência do Mongoose 9 e do driver do MongoDB).
 - Uma instância do **MongoDB** acessível (local ou remota).
 
 ```bash
@@ -260,3 +265,51 @@ curl -X POST http://localhost:3000/api/alunos/aluno-ana-souza/trabalhos \
 
 > Novos registros criados via API recebem ids no formato UUID (gerados com
 > `crypto.randomUUID()`), diferente dos ids legíveis usados nos dados fake acima.
+
+## Testes automatizados
+
+Os testes usam **Mocha**, **Chai** e **SuperTest**. Eles chamam o `app` do Express em processo,
+sem subir o servidor, e gravam no MongoDB real. Cobrem o fluxo do administrador e do aluno: login
+do admin, cadastro de aluno, login do aluno e entrega de trabalho.
+
+### Como rodar
+
+1. Suba um MongoDB local, por exemplo com `docker run -d -p 27017:27017 mongo:7`.
+2. Copie o `.env.example` para `.env`. O `MONGODB_URI` já aponta para o banco de teste
+   `gestao-de-alunos-test`, separado do banco de desenvolvimento.
+3. Rode `npm test`. Para gerar também o relatório HTML em `mochawesome-report/index.html`, rode
+   `npm run test:report`.
+
+Se `MONGODB_URI`, `ADMIN_EMAIL` ou `ADMIN_SENHA` faltarem, a suíte para com uma mensagem
+explicando o que definir. O dotenv não sobrescreve variáveis que já existem no ambiente, então o
+CI usa os valores do `env:` do workflow.
+
+### Estrutura
+
+```
+.mocharc.json             # spec, arquivo de setup e --exit
+test/
+  setup.js                # carrega o dotenv antes do app e fecha a conexão ao fim da suíte
+  helpers/
+    auth.helper.js        # loginAdmin() e loginAluno()
+    alunos.helper.js      # gerarAlunoUnico(), cadastrarAluno() e matricularAluno()
+  data/                   # cenários dos testes (Data-Driven Testing)
+  auth.test.js            # login do admin
+  alunos.test.js          # cadastro de aluno
+  login-aluno.test.js     # login do aluno
+  trabalhos.test.js       # entrega de trabalho
+```
+
+Cada arquivo em `test/data/` tem um aluno-base e uma lista de `cenarios`. O teste percorre a lista
+e gera um `it` por cenário. O campo `sobrescreve` troca campos do aluno-base, e `status` e `erro`
+dizem o que a API deve responder. Para acrescentar um caso, basta incluir um cenário no JSON.
+
+O banco persiste entre execuções. Por isso o helper acrescenta um sufixo único ao e-mail e à
+matrícula de cada aluno criado, e a suíte roda várias vezes sem dar 409.
+
+### Pipeline
+
+O workflow `.github/workflows/tests.yml` roda em push e pull request na `main`. Ele sobe um
+MongoDB `mongo:7` como service, instala as dependências com `npm ci`, roda `npm run test:report` com
+as variáveis do `.env.example` definidas em `env:` e publica o relatório do Mochawesome como
+artefato.

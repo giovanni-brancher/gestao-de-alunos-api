@@ -1,0 +1,33 @@
+{
+  "aluno": {
+    "nome": "Fernanda Rocha",
+    "email": "fernanda.rocha@example.com",
+    "matricula": "4001",
+    "senha": "senha123"
+  },
+  "cenarios": [
+    {
+      "descricao": "o aluno recém-cadastrado informar e-mail e senha corretos",
+      "sobrescreve": {},
+      "status": 200
+    },
+    {
+      "descricao": "a senha informada for inválida",
+      "sobrescreve": { "senha": "senha-incorreta" },
+      "status": 401,
+      "erro": "E-mail ou senha inválidos."
+    },
+    {
+      "descricao": "o e-mail informado não estiver cadastrado",
+      "sobrescreve": { "email": "inexistente@example.com" },
+      "status": 401,
+      "erro": "E-mail ou senha inválidos."
+    },
+    {
+      "descricao": "a senha não for informada",
+      "sobrescreve": { "senha": "" },
+      "status": 400,
+      "erro": "Os campos \"email\" e \"senha\" são obrigatórios."
+    }
+  ]
+}

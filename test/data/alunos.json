@@ -1,0 +1,78 @@
+{
+  "aluno": {
+    "nome": "Diego Alves",
+    "email": "diego.alves@example.com",
+    "matricula": "3001",
+    "senha": "654321"
+  },
+  "cenarios": [
+    {
+      "descricao": "o admin informar todos os campos",
+      "autenticacao": "admin",
+      "sobrescreve": {},
+      "status": 201
+    },
+    {
+      "descricao": "o admin cadastrar outro aluno com nome e senha diferentes",
+      "autenticacao": "admin",
+      "sobrescreve": { "nome": "Eva Costa", "senha": "abc123" },
+      "status": 201
+    },
+    {
+      "descricao": "o nome não for informado",
+      "autenticacao": "admin",
+      "sobrescreve": { "nome": "" },
+      "status": 400,
+      "erro": "Os campos \"nome\", \"email\", \"matricula\" e \"senha\" são obrigatórios."
+    },
+    {
+      "descricao": "o e-mail não for informado",
+      "autenticacao": "admin",
+      "sobrescreve": { "email": "" },
+      "status": 400,
+      "erro": "Os campos \"nome\", \"email\", \"matricula\" e \"senha\" são obrigatórios."
+    },
+    {
+      "descricao": "a matrícula não for informada",
+      "autenticacao": "admin",
+      "sobrescreve": { "matricula": "" },
+      "status": 400,
+      "erro": "Os campos \"nome\", \"email\", \"matricula\" e \"senha\" são obrigatórios."
+    },
+    {
+      "descricao": "a senha não for informada",
+      "autenticacao": "admin",
+      "sobrescreve": { "senha": "" },
+      "status": 400,
+      "erro": "Os campos \"nome\", \"email\", \"matricula\" e \"senha\" são obrigatórios."
+    },
+    {
+      "descricao": "o e-mail já estiver cadastrado",
+      "autenticacao": "admin",
+      "sobrescreve": { "email": "ana.souza@example.com" },
+      "status": 409,
+      "erro": "Já existe um aluno cadastrado com essa matrícula ou e-mail."
+    },
+    {
+      "descricao": "a matrícula já estiver cadastrada",
+      "autenticacao": "admin",
+      "sobrescreve": { "matricula": "2024001" },
+      "status": 409,
+      "erro": "Já existe um aluno cadastrado com essa matrícula ou e-mail."
+    },
+    {
+      "descricao": "a requisição não tiver token",
+      "autenticacao": "nenhuma",
+      "sobrescreve": {},
+      "status": 401,
+      "erro": "Token de autenticação não informado."
+    },
+    {
+      "descricao": "o token for de um aluno",
+      "autenticacao": "aluno",
+      "sobrescreve": {},
+      "status": 403,
+      "erro": "Você não tem permissão para acessar este recurso."
+    }
+  ]
+}

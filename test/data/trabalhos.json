@@ -1,0 +1,63 @@
+{
+  "aluno": {
+    "nome": "Gustavo Pires",
+    "email": "gustavo.pires@example.com",
+    "matricula": "5001",
+    "senha": "senha456"
+  },
+  "disciplinaMatriculada": "disciplina-matematica",
+  "cenarios": [
+    {
+      "descricao": "o aluno matriculado informar disciplina e título",
+      "autenticacao": "aluno",
+      "trabalho": { "disciplinaId": "disciplina-matematica", "titulo": "Lista de Exercícios 2" },
+      "status": 201
+    },
+    {
+      "descricao": "o aluno matriculado informar também a descrição",
+      "autenticacao": "aluno",
+      "trabalho": {
+        "disciplinaId": "disciplina-matematica",
+        "titulo": "Lista de Exercícios 3",
+        "descricao": "Exercícios de 21 a 40 do capítulo 3."
+      },
+      "status": 201
+    },
+    {
+      "descricao": "o título não for informado",
+      "autenticacao": "aluno",
+      "trabalho": { "disciplinaId": "disciplina-matematica" },
+      "status": 400,
+      "erro": "Os campos \"disciplinaId\" e \"titulo\" são obrigatórios."
+    },
+    {
+      "descricao": "o aluno não estiver matriculado na disciplina",
+      "autenticacao": "aluno",
+      "trabalho": { "disciplinaId": "disciplina-historia", "titulo": "Linha do Tempo" },
+      "status": 409,
+      "erro": "O aluno não está matriculado nesta disciplina."
+    },
+    {
+      "descricao": "a disciplina não existir",
+      "autenticacao": "aluno",
+      "trabalho": { "disciplinaId": "disciplina-inexistente", "titulo": "Lista de Exercícios 4" },
+      "status": 404,
+      "erro": "Disciplina com id \"disciplina-inexistente\" não encontrada."
+    },
+    {
+      "descricao": "a requisição não tiver token",
+      "autenticacao": "nenhuma",
+      "trabalho": { "disciplinaId": "disciplina-matematica", "titulo": "Lista de Exercícios 5" },
+      "status": 401,
+      "erro": "Token de autenticação não informado."
+    },
+    {
+      "descricao": "o aluno tentar entregar em nome de outro aluno",
+      "autenticacao": "aluno",
+      "alunoAlvo": "aluno-ana-souza",
+      "trabalho": { "disciplinaId": "disciplina-matematica", "titulo": "Lista de Exercícios 6" },
+      "status": 403,
+      "erro": "Você só pode acessar os seus próprios dados."
+    }
+  ]
+}

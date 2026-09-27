@@ -1,28 +1,24 @@
 import request from 'supertest';
 import { expect } from 'chai';
-import mongoose from 'mongoose';
 import app from '../src/app.js';
+import { credenciaisAdmin } from './helpers/auth.helper.js';
+import dados from './data/login-admin.json' with { type: 'json' };
 
 describe('POST /api/auth/login', () => {
-  after(async () => {
-    await mongoose.connection.close();
-  });
+  dados.cenarios.forEach(({ descricao, sobrescreve, status, erro }) => {
+    it(`deve retornar ${status} quando ${descricao}`, async () => {
+      const resposta = await request(app)
+        .post('/api/auth/login')
+        .send({ ...credenciaisAdmin(), ...sobrescreve });
 
-  it('deve retornar 200 e um token quando o admin informar e-mail e senha corretos', async () => {
-    const resposta = await request(app)
-      .post('/api/auth/login')
-      .send({ email: 'admin@escola.com', senha: 'admin123' });
+      expect(resposta.status).to.equal(status);
 
-    expect(resposta.status).to.equal(200);
-    expect(resposta.body).to.have.property('token');
-  });
-
-  it('deve retornar 401 quando a senha informada for inválida', async () => {
-    const resposta = await request(app)
-      .post('/api/auth/login')
-      .send({ email: 'admin@escola.com', senha: 'senha-incorreta' });
-
-    expect(resposta.status).to.equal(401);
-    expect(resposta.body.error).to.equal('E-mail ou senha inválidos.');
+      if (erro) {
+        expect(resposta.body.error).to.equal(erro);
+      } else {
+        expect(resposta.body).to.have.property('token');
+        expect(resposta.body.usuario.role).to.equal('admin');
+      }
+    });
   });
 });
