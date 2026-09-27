@@ -49,3 +49,27 @@ jobs:
         with:
           name: relatorio-mochawesome
           path: mochawesome-report/
+
+      - name: Preparar relatório para o GitHub Pages
+        uses: actions/upload-pages-artifact@v5
+        if: always()
+        with:
+          path: mochawesome-report/
+
+  publicar-relatorio:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.publicacao.outputs.page_url }}
+
+    steps:
+      - name: Publicar no GitHub Pages
+        id: publicacao
+        uses: actions/deploy-pages@v5
