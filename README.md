@@ -328,5 +328,9 @@ MongoDB `mongo:7` como service, instala as dependências com `npm ci`, roda `npm
 as variáveis do `.env.example` definidas em `env:` e publica o relatório do Mochawesome como
 artefato.
 
+Na `main`, depois que os testes passam, o job `publicar-relatorio` também publica o relatório no
+GitHub Pages: <https://giovanni-brancher.github.io/gestao-de-alunos-api/>. O link abre sem login.
+Pull requests não publicam.
+
 Para rodar sem fazer push, abra o workflow "Testes de API" na aba Actions do GitHub e clique em
 **Run workflow**.
