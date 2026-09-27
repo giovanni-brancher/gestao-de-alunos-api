@@ -307,9 +307,26 @@ dizem o que a API deve responder. Para acrescentar um caso, basta incluir um cen
 O banco persiste entre execuções. Por isso o helper acrescenta um sufixo único ao e-mail e à
 matrícula de cada aluno criado, e a suíte roda várias vezes sem dar 409.
 
+Um aluno recém-cadastrado não tem matrícula em nenhuma disciplina, e a entrega de trabalho
+retornaria 409. Só o admin pode matricular, então o `before()` de `trabalhos.test.js` usa o token
+do admin para cadastrar o aluno e matriculá-lo em `disciplina-matematica`. Depois faz o login do
+aluno, e os testes usam o token dele.
+
+### O que os testes cobrem
+
+| Arquivo | Cenários |
+|---------|----------|
+| `auth.test.js` | login do admin (200 e token), senha inválida (401), e-mail inexistente (401), senha ausente (400) |
+| `alunos.test.js` | cadastro válido (201), campo obrigatório ausente (400), e-mail ou matrícula duplicados (409), sem token (401), token de aluno (403) |
+| `login-aluno.test.js` | login do aluno recém-cadastrado (200), senha inválida (401), e-mail inexistente (401), senha ausente (400) |
+| `trabalhos.test.js` | entrega válida (201), título ausente (400), aluno sem matrícula na disciplina (409), disciplina inexistente (404), sem token (401), entrega em nome de outro aluno (403) |
+
 ### Pipeline
 
 O workflow `.github/workflows/tests.yml` roda em push e pull request na `main`. Ele sobe um
 MongoDB `mongo:7` como service, instala as dependências com `npm ci`, roda `npm run test:report` com
 as variáveis do `.env.example` definidas em `env:` e publica o relatório do Mochawesome como
 artefato.
+
+Para rodar sem fazer push, abra o workflow "Testes de API" na aba Actions do GitHub e clique em
+**Run workflow**.
