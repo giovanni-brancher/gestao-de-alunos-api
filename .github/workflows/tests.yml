@@ -24,10 +24,10 @@ jobs:
 
     steps:
       - name: Checkout do código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Configurar Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 20.19
           cache: npm
@@ -44,7 +44,7 @@ jobs:
           ADMIN_SENHA: admin123
 
       - name: Publicar relatório dos testes
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: relatorio-mochawesome
